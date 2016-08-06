@@ -365,11 +365,12 @@ rec {
   };
 
   vim-nix = buildVimPluginFrom2Nix { # created by nix#NixDerivation
-    name = "vim-nix-2016-05-31";
+    name = "vim-nix-2016-08-06";
+
     src = fetchgit {
       url = "git://github.com/LnL7/vim-nix";
-      rev = "9ac8876e5beb824018b9a09d4640f7efc2fbc8ae";
-      sha256 = "0whdf56c63vp4c3b2jfl1x5c0dxxrzwvxkfm5951qzpfy6xwg27x";
+      rev = "789520010bdd4b72a5ce9381f8016072319746ed";
+      sha256 = "0z7z6rvpvllviw20hf3wnn1ln67x8rk0ndqmxz51bbzriaf48cs4";
     };
     dependencies = [];
 
