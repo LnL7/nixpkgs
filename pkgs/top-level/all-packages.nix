@@ -1988,9 +1988,11 @@ in
     pythonPackages = pypyPackages;
   };
 
-  graphviz = callPackage ../tools/graphics/graphviz { };
+  graphviz = callPackage ../tools/graphics/graphviz {
+    inherit (darwin.apple_sdk.frameworks) ApplicationServices;
+  };
 
-  graphviz-nox = callPackage ../tools/graphics/graphviz {
+  graphviz-nox = graphviz.override {
     xorg = null;
     libdevil = libdevil-nox;
   };
