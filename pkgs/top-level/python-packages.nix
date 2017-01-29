@@ -25,6 +25,17 @@ let
 
   bootstrapped-pip = callPackage ../development/python-modules/bootstrapped-pip { };
 
+  cfg = pkgs.config.python or {};
+
+  types = import ../development/python-modules/fetchpypi/types.nix;
+
+  fetchpypi = callPackage ../development/python-modules/fetchpypi {
+    inherit python;
+    pip = bootstrapped-pip;
+    pipArgs = cfg.pipArgs or "";
+    pypiIndex = cfg.pypiIndex or "https://pypi.python.org/pypi";
+  };
+
   mkPythonDerivation = makeOverridable( callPackage ../development/interpreters/python/mk-python-derivation.nix {
   });
   buildPythonPackage = makeOverridable (callPackage ../development/interpreters/python/build-python-package.nix {
@@ -39,11 +50,14 @@ let
 
 in {
 
-  inherit python bootstrapped-pip pythonAtLeast pythonOlder isPy26 isPy27 isPy33 isPy34 isPy35 isPy36 isPyPy isPy3k mkPythonDerivation buildPythonPackage buildPythonApplication;
+  inherit python bootstrapped-pip fetchpypi pythonAtLeast pythonOlder isPy26 isPy27 isPy33 isPy34 isPy35 isPy36 isPyPy isPy3k mkPythonDerivation buildPythonPackage buildPythonApplication;
 
   # helpers
 
-  wrapPython = callPackage ../development/interpreters/python/wrap-python.nix {inherit python; inherit (pkgs) makeSetupHook makeWrapper; };
+  wrapPython = callPackage ../development/interpreters/python/wrap-python.nix {
+    inherit python;
+    inherit (pkgs) makeSetupHook makeWrapper;
+  };
 
   # specials
 
@@ -21903,7 +21917,8 @@ in {
 
 
   pyyaml = buildPythonPackage (rec {
-    name = "PyYAML-3.12";
+    name = "PyYAML-${version}";
+    version = "3.12";
 
     src = pkgs.fetchurl {
       url = "http://pyyaml.org/download/pyyaml/${name}.zip";
