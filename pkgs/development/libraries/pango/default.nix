@@ -1,5 +1,6 @@
 { stdenv, fetchurl, pkgconfig, libXft, cairo, harfbuzz
-, libintlOrEmpty, gobjectIntrospection, darwin
+, libintlOrEmpty, gobjectIntrospection
+, fixDarwinFrameworks, darwin
 }:
 
 with stdenv.lib;
@@ -19,13 +20,14 @@ stdenv.mkDerivation rec {
   outputs = [ "bin" "dev" "out" "devdoc" ];
 
   buildInputs = [ gobjectIntrospection ];
-  nativeBuildInputs = [ pkgconfig ]
+  nativeBuildInputs = [ pkgconfig ];
+  propagatedBuildInputs = [ cairo harfbuzz libXft ] ++ libintlOrEmpty
     ++ optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
+       fixDarwinFrameworks
        Carbon
        CoreGraphics
        CoreText
     ]);
-  propagatedBuildInputs = [ cairo harfbuzz libXft ] ++ libintlOrEmpty;
 
   enableParallelBuilding = true;
 

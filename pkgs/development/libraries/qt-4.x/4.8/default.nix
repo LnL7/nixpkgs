@@ -12,7 +12,7 @@
 , examples ? false
 , demos ? false
 # darwin support
-, cf-private, libobjc, ApplicationServices, OpenGL, Cocoa, AGL, libcxx
+, fixDarwinFrameworks, cf-private, libobjc, ApplicationServices, OpenGL, Cocoa, AGL, libcxx
 }:
 
 with stdenv.lib;
@@ -136,6 +136,7 @@ stdenv.mkDerivation rec {
     [ libXrender libXrandr libXinerama libXcursor libXext libXfixes libXv libXi
       libSM zlib libpng openssl dbus freetype fontconfig glib ]
         # Qt doesn't directly need GLU (just GL), but many apps use, it's small and doesn't remain a runtime-dep if not used
+    ++ optionals stdenv.isDarwin [ fixDarwinFrameworks ApplicationServices OpenGL Cocoa AGL libobjc ]
     ++ optional mesaSupported mesa_glu
     ++ optional ((buildWebkit || buildMultimedia) && stdenv.isLinux ) alsaLib
     ++ optionals (buildWebkit || buildMultimedia) [ gstreamer gst_plugins_base ];
@@ -146,7 +147,7 @@ stdenv.mkDerivation rec {
       postgresql sqlite libjpeg libmng libtiff icu ]
     ++ optionals (mysql != null) [ mysql.lib ]
     ++ optionals gtkStyle [ gtk2 gdk_pixbuf ]
-    ++ optionals stdenv.isDarwin [ cf-private ApplicationServices OpenGL Cocoa AGL libcxx libobjc ];
+    ++ optionals stdenv.isDarwin [ cf-private libcxx ];
 
   nativeBuildInputs = [ perl pkgconfig which ];
 

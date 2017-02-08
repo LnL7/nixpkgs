@@ -31,7 +31,7 @@
 , # Whether to build only the library.
   libOnly ? false
 
-, CoreServices, AudioUnit, Cocoa
+, fixDarwinFrameworks, CoreServices, AudioUnit, Cocoa
 }:
 
 stdenv.mkDerivation rec {
@@ -53,13 +53,12 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ pkgconfig intltool autoreconfHook ];
 
-  propagatedBuildInputs =
-    lib.optionals stdenv.isLinux [ libcap ];
+  propagatedBuildInputs = lib.optionals stdenv.isLinux [ libcap ]
+    ++ lib.optionals stdenv.isDarwin [ fixDarwinFrameworks CoreServices AudioUnit Cocoa ];
 
   buildInputs =
     [ libsndfile speexdsp fftwFloat ]
     ++ lib.optionals stdenv.isLinux [ glib dbus ]
-    ++ lib.optionals stdenv.isDarwin [ CoreServices AudioUnit Cocoa ]
     ++ lib.optionals (!libOnly) (
       [ libasyncns webrtc-audio-processing ]
       ++ lib.optional jackaudioSupport libjack2

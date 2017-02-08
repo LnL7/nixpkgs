@@ -4,7 +4,7 @@
 , xcbSupport ? true # no longer experimental since 1.12
 , glSupport ? true, mesa_noglu ? null # mesa is no longer a big dependency
 , pdfSupport ? true
-, darwin
+, fixDarwinFrameworks, darwin
 }:
 
 assert glSupport -> mesa_noglu != null;
@@ -45,19 +45,21 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     pkgconfig
     libiconv
-  ] ++ libintlOrEmpty ++ optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
-    CoreGraphics
-    CoreText
-    ApplicationServices
-    Carbon
-  ]);
+  ] ++ libintlOrEmpty;
 
   propagatedBuildInputs =
     with xorg; [ libXext fontconfig expat freetype pixman zlib libpng libXrender ]
     ++ optionals xcbSupport [ libxcb xcbutil ]
     ++ optional gobjectSupport glib
     ++ optional glSupport mesa_noglu
-    ; # TODO: maybe liblzo but what would it be for here?
+    # TODO: maybe liblzo but what would it be for here?
+    ++ optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
+    fixDarwinFrameworks
+    CoreGraphics
+    CoreText
+    ApplicationServices
+    Carbon
+  ]);
 
   configureFlags = if stdenv.isDarwin then [
     "--disable-dependency-tracking"

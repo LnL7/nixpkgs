@@ -1,9 +1,10 @@
 { stdenv, fetchurl, alsaLib, pkgconfig
-, AudioUnit, AudioToolbox, CoreAudio, CoreServices, Carbon }:
+, fixDarwinFrameworks, AudioUnit, AudioToolbox, CoreAudio, CoreServices, Carbon
+}:
 
 stdenv.mkDerivation rec {
   name = "portaudio-19-20140130";
-  
+
   src = fetchurl {
     url = http://www.portaudio.com/archives/pa_stable_v19_20140130.tgz;
     sha256 = "0mwddk4qzybaf85wqfhxqlf0c5im9il8z03rd4n127k8y2jj9q4g";
@@ -14,7 +15,7 @@ stdenv.mkDerivation rec {
 
   configureFlags = [ "--disable-mac-universal" ];
 
-  propagatedBuildInputs = stdenv.lib.optionals stdenv.isDarwin [ AudioUnit AudioToolbox CoreAudio CoreServices Carbon ];
+  propagatedBuildInputs = stdenv.lib.optionals stdenv.isDarwin [ fixDarwinFrameworks AudioUnit AudioToolbox CoreAudio CoreServices Carbon ];
 
   patchPhase = stdenv.lib.optionalString stdenv.isDarwin ''
     sed -i '50 i\

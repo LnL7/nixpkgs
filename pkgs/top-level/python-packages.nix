@@ -14273,7 +14273,7 @@ in {
 
 
   matplotlib = callPackage ../development/python-modules/matplotlib/default.nix {
-    stdenv = if stdenv.isDarwin then pkgs.clangStdenv else pkgs.stdenv;
+    inherit (pkgs.darwin.apple_sdk.frameworks) Cocoa;
     enableGhostscript = true;
   };
 

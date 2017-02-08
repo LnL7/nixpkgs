@@ -6,7 +6,7 @@
 , enableGtk3 ? false, cairo
 , enableTk ? false, tcl ? null, tk ? null, tkinter ? null, libX11 ? null
 , enableQt ? false, pyqt4
-, libcxx
+, fixDarwinFrameworks, libcxx, Cocoa
 }:
 
 assert enableGhostscript -> ghostscript != null;
@@ -38,6 +38,7 @@ buildPythonPackage rec {
     [ cycler dateutil nose numpy pyparsing tornado freetype
       libpng pkgconfig mock pytz
     ]
+    ++ stdenv.lib.optionals stdenv.isDarwin [ fixDarwinFrameworks Cocoa ]
     ++ stdenv.lib.optional enableGtk2 pygtk
     ++ stdenv.lib.optionals enableGtk3 [ cairo pycairo gtk3 gobjectIntrospection pygobject3 ]
     ++ stdenv.lib.optionals enableTk [ tcl tk tkinter libX11 ]

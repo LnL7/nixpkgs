@@ -24,7 +24,7 @@
 , libpngSupport ? true, libpng ? null
 , libjpegSupport ? true, libjpeg ? null
 , useUnfreeCodecs ? false
-, darwin ? null
+, fixDarwinFrameworks, darwin ? null
 }:
 
 assert fontconfigSupport -> (fontconfig != null);
@@ -120,7 +120,7 @@ stdenv.mkDerivation rec {
     ++ optional libpngSupport libpng
     ++ optional libjpegSupport libjpeg
     ++ optional bs2bSupport libbs2b
-    ++ (with darwin.apple_sdk.frameworks; optionals stdenv.isDarwin [ Cocoa OpenGL ])
+    ++ (with darwin.apple_sdk.frameworks; optionals stdenv.isDarwin [ fixDarwinFrameworks Cocoa OpenGL ])
     ;
 
   nativeBuildInputs = [ yasm ];
