@@ -1,14 +1,13 @@
 { config, lib, pkgs, ... }:
-let
 
+with lib;
+
+let
   inherit (config.security) wrapperDir wrappers;
 
   parentWrapperDir = dirOf wrapperDir;
 
-  programs =
-    (lib.mapAttrsToList
-      (n: v: (if v ? "program" then v else v // {program=n;}))
-      wrappers);
+  programs = attrValues wrappers;
 
   securityWrapper = pkgs.stdenv.mkDerivation {
     name            = "security-wrapper";
@@ -25,14 +24,14 @@ let
   ###### Activation script for the setcap wrappers
   mkSetcapProgram =
     { program
-    , capabilities
     , source
+    , capabilities
     , owner  ? "nobody"
     , group  ? "nogroup"
     , permissions ? "u+rx,g+x,o+x"
     , ...
     }:
-    assert (lib.versionAtLeast (lib.getVersion config.boot.kernelPackages.kernel) "4.3");
+    assert (versionAtLeast (getVersion config.boot.kernelPackages.kernel) "4.3");
     ''
       cp ${securityWrapper}/bin/security-wrapper $wrapperDir/${program}
       echo -n "${source}" > $wrapperDir/${program}.real
@@ -54,10 +53,10 @@ let
   mkSetuidProgram =
     { program
     , source
-    , owner  ? "nobody"
-    , group  ? "nogroup"
     , setuid ? false
     , setgid ? false
+    , owner  ? "nobody"
+    , group  ? "nogroup"
     , permissions ? "u+rx,g+x,o+x"
     , ...
     }:
@@ -74,23 +73,9 @@ let
 
   mkWrappedPrograms =
     builtins.map
-      (s: if (s ? "capabilities")
-          then mkSetcapProgram
-                 ({ owner = "root";
-                    group = "root";
-                  } // s)
-          else if 
-             (s ? "setuid"  && s.setuid  == true) ||
-             (s ? "setguid" && s.setguid == true) ||
-             (s ? "permissions")
-          then mkSetuidProgram s
-          else mkSetuidProgram
-                 ({ owner  = "root";
-                    group  = "root";
-                    setuid = true;
-                    setgid = false;
-                    permissions = "u+rx,g+x,o+x";
-                  } // s)
+      (s: if (s.capabilities != "")
+          then mkSetcapProgram s
+          else mkSetuidProgram s
       ) programs;
 in
 {
@@ -98,10 +83,67 @@ in
   ###### interface
 
   options = {
-    security.wrappers = lib.mkOption {
-      type = lib.types.attrs;
+    security.wrappers = mkOption {
+      type = types.attrsOf (types.submodule (
+        { name, config, ... }:
+        { options = {
+            source  = mkOption {
+              type = types.path;
+              description = "The absolute path to the program to be wrapped.";
+            };
+
+            program = mkOption {
+              type = types.str;
+              description = "Name of the program to wrap.";
+            };
+
+            capabilities = mkOption {
+              type = types.str;
+              default = "";
+              example = "cap_net_rap+ep";
+              description = "What capabilities should be propagated down to the real program.";
+            };
+
+            setuid = mkOption {
+              type = types.bool;
+              default = true;
+              description = "Whether to set the u+s for the wrapper.";
+            };
+
+            setgid = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Whether to set the g+s bit for the wrapper.";
+            };
+
+            owner = mkOption {
+              type = types.str;
+              default = "root";
+              description = "What owner to use for the wrapper.";
+            };
+
+            group = mkOption {
+              type = types.str;
+              default = "root";
+              description = "What group to use for the wrapper.";
+            };
+
+            permissions = mkOption {
+              type = types.str;
+              default = "u+rx,g+x,o+x";
+              description = "What permissions to set on the wrapper.";
+            };
+          };
+
+          config = {
+            program = mkDefault name;
+
+            setuid = mkIf (config.capabilities != "") false;
+            setgid = mkIf (config.capabilities != "") false;
+          };
+        }));
       default = {};
-      example = lib.literalExample
+      example = literalExample
         ''
           { sendmail.source = "/nix/store/.../bin/sendmail";
             ping = {
@@ -141,8 +183,8 @@ in
       '';
     };
 
-    security.wrapperDir = lib.mkOption {
-      type        = lib.types.path;
+    security.wrapperDir = mkOption {
+      type        = types.path;
       default     = "/run/wrappers/bin";
       internal    = true;
       description = ''
@@ -171,7 +213,7 @@ in
 
     ###### setcap activation script
     system.activationScripts.wrappers =
-      lib.stringAfter [ "users" ]
+      stringAfter [ "users" ]
         ''
           # Look in the system path and in the default profile for
           # programs to be wrapped.
@@ -200,7 +242,7 @@ in
           wrapperDir=$(mktemp --directory --tmpdir="${parentWrapperDir}" wrappers.XXXXXXXXXX)
           chmod a+rx $wrapperDir
 
-          ${lib.concatStringsSep "\n" mkWrappedPrograms}
+          ${concatStringsSep "\n" mkWrappedPrograms}
 
           if [ -L ${wrapperDir} ]; then
             # Atomically replace the symlink
