@@ -49,7 +49,7 @@ qtSubmodule {
         -docdir $out/share/doc/qt5"
   '';
   propagatedBuildInputs = [
-    dbus zlib alsaLib
+    dbus zlib
 
     # Image formats
     libjpeg libpng libtiff
@@ -63,7 +63,7 @@ qtSubmodule {
 
     libcap
     pciutils
-  ];
+  ] ++ stdenv.lib.optional stdenv.isLinux alsaLib;
   patches = stdenv.lib.optional stdenv.needsPax ./qtwebengine-paxmark-mksnapshot.patch;
   postInstall = ''
     cat > $out/libexec/qt.conf <<EOF
