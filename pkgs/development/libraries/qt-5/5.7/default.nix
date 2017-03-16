@@ -18,7 +18,7 @@ top-level attribute to `top-level/all-packages.nix`.
   newScope,
   stdenv, fetchurl, makeSetupHook, makeWrapper,
   bison, cups ? null, harfbuzz, mesa, perl,
-  gstreamer, gst-plugins-base,
+  gstreamer, gst-plugins-base, darwin,
 
   # options
   developerBuild ? false,
@@ -70,7 +70,9 @@ let
         inherit developerBuild decryptSslTraffic;
       };
 
-      qtconnectivity = callPackage ./qtconnectivity.nix {};
+      qtconnectivity = callPackage ./qtconnectivity.nix {
+        inherit (darwin.apple_sdk.frameworks) CoreBluetooth;
+      };
       qtdeclarative = callPackage ./qtdeclarative {};
       qtdoc = callPackage ./qtdoc.nix {};
       qtgraphicaleffects = callPackage ./qtgraphicaleffects.nix {};

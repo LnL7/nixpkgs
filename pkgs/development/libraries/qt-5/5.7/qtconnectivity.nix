@@ -1,6 +1,7 @@
-{ qtSubmodule, qtbase, qtdeclarative }:
+{ stdenv, qtSubmodule, qtbase, qtdeclarative, CoreBluetooth }:
 
 qtSubmodule {
   name = "qtconnectivity";
-  qtInputs = [ qtbase qtdeclarative ];
+  qtInputs = [ qtbase qtdeclarative ]
+    ++ stdenv.lib.optional stdenv.isDarwin CoreBluetooth;
 }

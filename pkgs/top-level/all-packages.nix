@@ -9377,14 +9377,11 @@ with pkgs;
 
   libsForQt56 = recurseIntoAttrs (lib.makeScope qt56.newScope mkLibsForQt5);
 
-  qt57 = recurseIntoAttrs (import ../development/libraries/qt-5/5.7 {
-    inherit newScope;
-    inherit stdenv fetchurl makeSetupHook makeWrapper;
+  qt57 = recurseIntoAttrs (callPackage ../development/libraries/qt-5/5.7 {
     bison = bison2; # error: too few arguments to function 'int yylex(...
     cups = if stdenv.isLinux then cups else null;
     harfbuzz = harfbuzz-icu;
     mesa = mesa_noglu;
-    inherit perl;
     inherit (gst_all_1) gstreamer gst-plugins-base;
   });
 
