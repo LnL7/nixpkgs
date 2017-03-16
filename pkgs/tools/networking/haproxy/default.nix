@@ -14,11 +14,11 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ lua5_3 openssl pcre zlib ];
 
-  # TODO: make it work on bsd as well
   makeFlags = [
     "PREFIX=\${out}"
-    "TARGET=${if stdenv.isSunOS then "solaris" else if stdenv.isLinux then "linux2628" else "generic"}"
+    "TARGET=${if stdenv.isSunOS then "solaris" else if stdenv.isLinux then "linux2628" else if stdenv.isDarwin then "osx" else "generic"}"
   ];
+
   buildFlags = [
     "USE_LUA=yes"
     "LUA_LIB=${pkgs.lua5_3}/lib"
@@ -27,10 +27,9 @@ stdenv.mkDerivation rec {
     "USE_PCRE_JIT=yes"
     "USE_OPENSSL=yes"
     "USE_ZLIB=yes"
-    (stdenv.lib.optionalString stdenv.isDarwin "CC=cc USE_KQUEUE=1")
-  ];
+  ] ++ stdenv.lib.optional stdenv.isDarwin "CC=cc LUA_LIB_NAME=liblua.dylib";
 
-  meta = {
+  meta = with stdenv.lib; {
     description = "Reliable, high performance TCP/HTTP load balancer";
     longDescription = ''
       HAProxy is a free, very fast and reliable solution offering high
@@ -41,8 +40,8 @@ stdenv.mkDerivation rec {
       hardware.
     '';
     homepage = http://haproxy.1wt.eu;
-    maintainers = [ stdenv.lib.maintainers.garbas ];
-    platforms = with stdenv.lib.platforms; linux ++ darwin;
-    license = stdenv.lib.licenses.gpl2;
+    maintainers = [ maintainers.garbas ];
+    platforms = with platforms; linux ++ darwin;
+    license = licenses.gpl2;
   };
 }
