@@ -237,10 +237,22 @@ following incompatible changes:</para>
     </para>
   </listitem>
 
+  <listitem>
+    <para>
+      The socket handling of the <literal>services.rmilter</literal> module
+      has been fixed and refactored. As rmilter doesn't support binding to
+      more than one socket, the options <literal>bindUnixSockets</literal>
+      and <literal>bindInetSockets</literal> have been replaced by
+      <literal>services.rmilter.bindSocket.*</literal>. The default is still
+      a unix socket in <literal>/run/rmilter/rmilter.sock</literal>. Refer to
+      the options documentation for more information.
+    </para>
+  </listitem>
+
 </itemizedlist>
 
 
-<para>Other notable improvements:</para>
+<para>Other notable changes:</para>
 
 <itemizedlist>
 
@@ -268,6 +280,14 @@ following incompatible changes:</para>
       deterministic bytecode. This has security implications and is relevant for
       those using Python in a <literal>nix-shell</literal>. See the Nixpkgs manual
       for details.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+      When adding new or updating current libraries, the expressions should be put
+      in separate files in <literal>pkgs/development/python-modules</literal> and 
+      called from <literal>python-packages.nix</literal>.
     </para>
   </listitem>
 
