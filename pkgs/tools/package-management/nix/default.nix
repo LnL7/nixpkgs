@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, fetchFromGitHub, perl, curl, bzip2, sqlite, openssl ? null, xz
+{ lib, stdenv, fetchpatch, fetchurl, fetchFromGitHub, perl, curl, bzip2, sqlite, openssl ? null, xz
 , pkgconfig, boehmgc, perlPackages, libsodium, aws-sdk-cpp
 , autoreconfHook, autoconf-archive, bison, flex, libxml2, libxslt, docbook5, docbook5_xsl
 , storeDir ? "/nix/store"
@@ -37,6 +37,14 @@ let
          export LIBRARY_PATH="${bzip2.out}/lib"
          export CXXFLAGS="-Wno-error=reserved-user-defined-literal"
       '';
+
+    patches =
+      [ (fetchpatch {
+          name = "valuemap-allocator.patch";
+          url = https://github.com/NixOS/nix/commit/773313591f167888718228bf5ada44a81f3fa32e.patch;
+          sha256 = "0zmqc2534q24lv5hdr89vqc0pvsdsxzfmim8ax405p5c2nxah5zg";
+        })
+      ];
 
     configureFlags =
       [ "--with-store-dir=${storeDir}"
