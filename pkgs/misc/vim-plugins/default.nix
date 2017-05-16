@@ -1705,6 +1705,15 @@ rec {
 
   };
 
+  ale = vimUtils.buildVimPluginFrom2Nix {
+    name = "vim-ale-2017-05-16";
+    src = fetchgit {
+      url = "https://github.com/w0rp/ale";
+      rev = "e2860f8a26dc9c04bb4ad6fb59ffb8c743717149";
+      sha256 = "1mpqvfyl47ap32g9qprxpwfcgxhm25ar6qy3p01n77fygva0371d";
+    };
+  };
+
   vim-wakatime = buildVimPluginFrom2Nix { # created by nix#NixDerivation
     name = "vim-wakatime-2017-04-22";
     src = fetchgit {
