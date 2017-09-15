@@ -126,6 +126,11 @@ appleDerivation {
     # IOKit (and possibly the others) is incomplete, so let's not make it visible from here...
     mkdir $out/Library/PrivateFrameworks
     mv $out/Library/Frameworks/IOKit.framework $out/Library/PrivateFrameworks
+
+    # Create os-release
+    mkdir -p $out/nix-support
+    $CC -I$out/Library/Frameworks/Kernel.framework/Headers -o os-release ${./os-release.c}
+    ./os-release > $out/nix-support/os-release
   '';
 
   meta = {
