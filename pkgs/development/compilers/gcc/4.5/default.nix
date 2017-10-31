@@ -99,6 +99,7 @@ let version = "4.5.4";
         "--enable-sjlj-exceptions"
         "--enable-threads=win32"
         "--disable-win32-registry"
+        "--disable-libmpx" # requires libc
       ] else if crossStageStatic then [
         "--disable-libssp"
         "--disable-nls"
@@ -107,7 +108,8 @@ let version = "4.5.4";
         "--disable-libmudflap"
         "--disable-libgomp"
         "--disable-shared"
-        "--disable-decimal-float" # libdecnumber requires libc
+        "--disable-decimal-float" # requires libc
+        "--disable-libmpx" # requires libc
       ] else [
         "--with-headers=${libcCross}/include"
         "--enable-__cxa_atexit"
