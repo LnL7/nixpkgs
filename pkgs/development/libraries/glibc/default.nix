@@ -1,5 +1,5 @@
 { stdenv, callPackage
-, withLinuxHeaders ? true
+, withLinuxHeaders ? true, linuxHeaders ? null
 , installLocales ? true
 , profilingLibraries ? false
 , withGd ? false
@@ -7,7 +7,7 @@
 
 assert stdenv.cc.isGNU;
 
-callPackage ./common.nix { inherit stdenv; } {
+callPackage ./common.nix { inherit stdenv linuxHeaders; } {
     name = "glibc" + stdenv.lib.optionalString withGd "-gd";
 
     inherit withLinuxHeaders profilingLibraries installLocales withGd;

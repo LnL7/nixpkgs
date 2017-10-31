@@ -1,6 +1,6 @@
-{ stdenvNoCC, lib, buildPackages
+{ stdenv, lib, buildPackages
 , buildPlatform, hostPlatform
-, fetchurl, perl
+, fetchurl, gettext, perl
 }:
 
 assert hostPlatform.isLinux;
@@ -10,7 +10,7 @@ let
   inherit (hostPlatform.platform) kernelHeadersBaseConfig;
 in
 
-stdenvNoCC.mkDerivation {
+stdenv.mkDerivation {
   name = "linux-headers-${version}";
 
   src = fetchurl {
@@ -25,16 +25,18 @@ stdenvNoCC.mkDerivation {
   # It may look odd that we use `stdenvNoCC`, and yet explicit depend on a cc.
   # We do this so we have a build->build, not build->host, C compiler.
   depsBuildBuild = [ buildPackages.stdenv.cc ];
-  nativeBuildInputs = [ perl ];
+  nativeBuildInputs = [ perl ] ++ lib.optional (buildPlatform.libc != "glibc") gettext;
 
   extraIncludeDirs = lib.optional hostPlatform.isPowerPC ["ppc"];
+
+  hardeningDisable = lib.optional buildPlatform.isDarwin "format";
 
   buildPhase = ''
     if test -n "$targetConfig"; then
        export ARCH=$platform
     fi
-    make ${kernelHeadersBaseConfig} SHELL=bash
-    make mrproper headers_check SHELL=bash
+    make ${kernelHeadersBaseConfig} SHELL=bash 'HOSTCC=$(BUILD_CC)' 'HOSTCXX=$(BUILD_CXX)' 'HOSTLD=$(BUILD_LD)'
+    make mrproper headers_check SHELL=bash 'HOSTCC=$(BUILD_CC)' 'HOSTCXX=$(BUILD_CXX)' 'HOSTLD=$(BUILD_LD)'
   '';
 
   installPhase = ''

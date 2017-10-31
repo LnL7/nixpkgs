@@ -8199,6 +8199,7 @@ with pkgs;
   glibcCross = callPackage ../development/libraries/glibc {
     installLocales = config.glibc.locales or false;
     stdenv = crossLibcStdenv;
+    linuxHeaders = linuxHeaders.override { stdenv = crossLibcStdenv; };
   };
 
   # We can choose:

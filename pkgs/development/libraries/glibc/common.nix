@@ -30,7 +30,7 @@ assert withGd -> gd != null && libpng != null;
 
 stdenv.mkDerivation ({
   inherit  installLocales;
-  linuxHeaders = if withLinuxHeaders then linuxHeaders else null;
+  linuxHeaders = if withLinuxHeaders then linuxHeaders.crossDrv or linuxHeaders else null;
 
   # The host/target system.
   crossConfig = if cross != null then cross.config else null;
