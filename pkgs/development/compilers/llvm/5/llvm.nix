@@ -16,6 +16,7 @@
 , libcxxabi
 , compiler-rt_src
 , llvm_src ? fetch "llvm" "1c07i0b61j69m578lgjkyayg419sh7sn40xb3j112nr2q2gli9sz"
+, doCheck ? stdenv.isLinux && (!stdenv.isi686)
 , debugVersion ? false
 , enableManpages ? false
 , enableSharedLibraries ? true
@@ -28,7 +29,7 @@ let
     concatStringsSep "." (take 2 (splitString "." release_version));
 in stdenv.mkDerivation (rec {
   name = "llvm-${version}";
-  inherit version;
+  inherit version doCheck;
 
   srcs = [ llvm_src compiler-rt_src ];
 
@@ -90,7 +91,9 @@ in stdenv.mkDerivation (rec {
   cmakeFlags = with stdenv; [
     "-DCMAKE_BUILD_TYPE=${if debugVersion then "Debug" else "Release"}"
     "-DLLVM_INSTALL_UTILS=ON"  # Needed by rustc
-    "-DLLVM_BUILD_TESTS=ON"
+    "-DLLVM_BUILD_TESTS=${if doCheck then "ON" else "OFF"}"
+    "-DLLVM_INCLUDE_TESTS=${if doCheck then "ON" else "OFF"}"
+
     "-DLLVM_ENABLE_FFI=ON"
     "-DLLVM_ENABLE_RTTI=ON"
     "-DCOMPILER_RT_INCLUDE_TESTS=OFF" # FIXME: requires clang source code
@@ -113,12 +116,12 @@ in stdenv.mkDerivation (rec {
 
   postBuild = ''
     rm -fR $out
-
     paxmark m bin/{lli,llvm-rtdyld}
+    paxmark m bin/lli-child-target
+  '' + stdenv.lib.optionalString doCheck ''
     paxmark m unittests/ExecutionEngine/MCJIT/MCJITTests
     paxmark m unittests/ExecutionEngine/Orc/OrcJITTests
     paxmark m unittests/Support/SupportTests
-    paxmark m bin/lli-child-target
   '';
 
   preCheck = ''
@@ -137,10 +140,6 @@ in stdenv.mkDerivation (rec {
     ln -s $lib/lib/libLLVM.dylib $lib/lib/libLLVM-${shortVersion}.dylib
     ln -s $lib/lib/libLLVM.dylib $lib/lib/libLLVM-${release_version}.dylib
   '';
-
-  doCheck = stdenv.isLinux && (!stdenv.isi686);
-
-  checkTarget = "check-all";
 
   enableParallelBuilding = true;
 

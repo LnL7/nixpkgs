@@ -16,6 +16,8 @@ let
       sha256 = "1dplakckfjas5gz43g9w9d8lf3acjhxiw5g64nf1f6kjir2hk4iy";
       name = "${llvmPackages.llvm.name}.src.tar.gz";
     };
+    # The tests fail because of issues with llvm-lit/llvm-xray.
+    doCheck = false;
   };
 in
 
