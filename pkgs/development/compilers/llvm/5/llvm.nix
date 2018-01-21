@@ -13,8 +13,9 @@
 , version
 , release_version
 , zlib
-, compiler-rt_src
 , libcxxabi
+, compiler-rt_src
+, llvm_src ? fetch "llvm" "1c07i0b61j69m578lgjkyayg419sh7sn40xb3j112nr2q2gli9sz"
 , debugVersion ? false
 , enableManpages ? false
 , enableSharedLibraries ? true
@@ -22,20 +23,22 @@
 }:
 
 let
-  src = fetch "llvm" "1c07i0b61j69m578lgjkyayg419sh7sn40xb3j112nr2q2gli9sz";
-
   # Used when creating a version-suffixed symlink of libLLVM.dylib
   shortVersion = with stdenv.lib;
     concatStringsSep "." (take 2 (splitString "." release_version));
 in stdenv.mkDerivation (rec {
   name = "llvm-${version}";
+  inherit version;
 
-  unpackPhase = ''
-    unpackFile ${src}
-    mv llvm-${version}* llvm
-    sourceRoot=$PWD/llvm
-    unpackFile ${compiler-rt_src}
-    mv compiler-rt-* $sourceRoot/projects/compiler-rt
+  srcs = [ llvm_src compiler-rt_src ];
+
+  setSourceRoot = ''
+    mv llvm-* llvm
+    sourceRoot=llvm
+  '';
+
+  postUnpack = ''
+    mv compiler-rt-* llvm/projects/compiler-rt
   '';
 
   outputs = [ "out" ]
@@ -141,7 +144,7 @@ in stdenv.mkDerivation (rec {
 
   enableParallelBuilding = true;
 
-  passthru.src = src;
+  passthru.src = llvm_src;
 
   meta = {
     description = "Collection of modular and reusable compiler and toolchain technologies";
