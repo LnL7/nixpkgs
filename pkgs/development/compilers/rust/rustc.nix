@@ -16,7 +16,7 @@
 } @ args:
 
 let
-  inherit (stdenv.lib) optional optionalString;
+  inherit (stdenv.lib) optional optionals optionalString;
   inherit (darwin.apple_sdk.frameworks) Security;
 
   procps = if stdenv.isDarwin then darwin.ps else args.procps;
@@ -28,9 +28,7 @@ in
 
 stdenv.mkDerivation {
   name = "rustc-${version}";
-  inherit version;
-
-  inherit src;
+  inherit src version;
 
   __darwinAllowLocalNetworking = true;
 
@@ -54,9 +52,8 @@ stdenv.mkDerivation {
                 ++ [ "--enable-vendor" "--disable-locked-deps" ]
                 # ++ [ "--jemalloc-root=${jemalloc}/lib"
                 ++ [ "--default-linker=${targetPackages.stdenv.cc}/bin/cc" "--default-ar=${targetPackages.stdenv.cc.bintools}/bin/ar" ]
-                ++ optional (!forceBundledLLVM) [ "--enable-llvm-link-shared" ]
-                ++ optional (targets != []) "--target=${target}"
-                ++ optional (!forceBundledLLVM) "--llvm-root=${llvmShared}";
+                ++ optionals (!forceBundledLLVM) [ "--enable-llvm-link-shared" "--llvm-root=${llvmShared}" ]
+                ++ optional (targets != []) "--target=${target}";
 
   patches = patches ++ targetPatches;
 

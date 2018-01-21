@@ -1,4 +1,4 @@
-{ stdenv, callPackage, recurseIntoAttrs, makeRustPlatform, llvm, fetchurl
+{ stdenv, callPackage, recurseIntoAttrs, makeRustPlatform, pkgs, fetchurl, fetchzip
 , targets ? []
 , targetToolchains ? []
 , targetPatches ? []
@@ -7,12 +7,23 @@
 let
   rustPlatform = recurseIntoAttrs (makeRustPlatform (callPackage ./bootstrap.nix {}));
   version = "1.22.1";
+
+  llvmPackages = pkgs.llvmPackages_5;
+
+  llvm = llvmPackages.llvm.override {
+    llvm_src = fetchurl {
+      url = "https://github.com/rust-lang/llvm/archive/c7a16bd57c2a9c643a52f0cebecdaf0b6a996da1.tar.gz";
+      sha256 = "1dplakckfjas5gz43g9w9d8lf3acjhxiw5g64nf1f6kjir2hk4iy";
+      name = "${llvmPackages.llvm.name}.src.tar.gz";
+    };
+  };
 in
+
 rec {
+  inherit llvm;
+
   rustc = callPackage ./rustc.nix {
     inherit llvm targets targetPatches targetToolchains rustPlatform version;
-
-    forceBundledLLVM = true;
 
     configureFlags = [ "--release-channel=stable" ];
 
