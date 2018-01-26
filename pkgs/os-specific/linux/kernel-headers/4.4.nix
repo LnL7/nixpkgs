@@ -1,4 +1,4 @@
-{ stdenvNoCC, lib, buildPackages
+{ stdenv, lib, buildPackages
 , buildPlatform, hostPlatform
 , fetchurl, perl
 }:
@@ -10,7 +10,7 @@ let
   inherit (hostPlatform.platform) kernelHeadersBaseConfig;
 in
 
-stdenvNoCC.mkDerivation {
+stdenv.mkDerivation {
   name = "linux-headers-${version}";
 
   src = fetchurl {
@@ -29,16 +29,21 @@ stdenvNoCC.mkDerivation {
 
   extraIncludeDirs = lib.optional hostPlatform.isPowerPC ["ppc"];
 
+  ${if buildPlatform.isDarwin then "hardeningDisable" else null} = lib.optional buildPlatform.isDarwin "format";
+
   buildPhase = ''
     if test -n "$targetConfig"; then
        export ARCH=$platform
     fi
-    make ${kernelHeadersBaseConfig} SHELL=bash
-    make mrproper headers_check SHELL=bash
+    make ${kernelHeadersBaseConfig} SHELL=bash 'HOSTCC=$(BUILD_CC)' 'HOSTCXX=$(BUILD_CXX)' 'HOSTLD=$(BUILD_LD)'
+  ''
+  # Skip check on darwin, case-sensitivity issues.
+  + lib.optionalString (!buildPlatform.isDarwin) ''
+    make mrproper headers_check SHELL=bash 'HOSTCC=$(BUILD_CC)' 'HOSTCXX=$(BUILD_CXX)' 'HOSTLD=$(BUILD_LD)'
   '';
 
   installPhase = ''
-    make INSTALL_HDR_PATH=$out headers_install
+    make headers_install INSTALL_HDR_PATH=$out 'HOSTCC=$(BUILD_CC)' 'HOSTCXX=$(BUILD_CXX)' 'HOSTLD=$(BUILD_LD)'
 
     # Some builds (e.g. KVM) want a kernel.release.
     mkdir -p $out/include/config
@@ -56,6 +61,6 @@ stdenvNoCC.mkDerivation {
   meta = with lib; {
     description = "Header files and scripts for Linux kernel";
     license = licenses.gpl2;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }
