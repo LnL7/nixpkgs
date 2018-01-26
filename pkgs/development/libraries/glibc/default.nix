@@ -98,4 +98,5 @@ callPackage ./common.nix { inherit stdenv; } {
     separateDebugInfo = true;
 
     meta.description = "The GNU C Library";
+    meta.platforms = stdenv.lib.platforms.unix;
   }
