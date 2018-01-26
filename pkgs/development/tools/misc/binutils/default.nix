@@ -65,6 +65,8 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "info" "man" ];
 
+  ${if targetPlatform != hostPlatform && buildPlatform.isDarwin then "hardeningDisable" else null} = [ "format" ];
+
   depsBuildBuild = [ buildPackages.stdenv.cc ];
   nativeBuildInputs = [ bison ];
   buildInputs = [ zlib ];
