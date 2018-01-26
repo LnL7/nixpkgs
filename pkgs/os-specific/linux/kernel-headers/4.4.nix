@@ -29,16 +29,19 @@ stdenvNoCC.mkDerivation {
 
   extraIncludeDirs = lib.optional hostPlatform.isPowerPC ["ppc"];
 
+  hardeningDisable = lib.optional buildPackages.stdenv.cc.isClang "format";
+
   buildPhase = ''
     if test -n "$targetConfig"; then
        export ARCH=$platform
     fi
-    make ${kernelHeadersBaseConfig} SHELL=bash
+    make ${kernelHeadersBaseConfig} SHELL=bash ${lib.optionalString buildPackages.stdenv.cc.isClang "CC=cc HOSTCC=cc"}
+  '' + lib.optionalString (buildPlatform == hostPlatform) ''
     make mrproper headers_check SHELL=bash
   '';
 
   installPhase = ''
-    make INSTALL_HDR_PATH=$out headers_install
+    make headers_install INSTALL_HDR_PATH=$out SHELL=bash ${lib.optionalString buildPackages.stdenv.cc.isClang "CC=cc HOSTCC=cc"}
 
     # Some builds (e.g. KVM) want a kernel.release.
     mkdir -p $out/include/config
@@ -56,6 +59,6 @@ stdenvNoCC.mkDerivation {
   meta = with lib; {
     description = "Header files and scripts for Linux kernel";
     license = licenses.gpl2;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }
