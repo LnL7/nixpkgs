@@ -7917,6 +7917,8 @@ with pkgs;
 
   rr = callPackage ../development/tools/analysis/rr { };
 
+  rsdocs2docset = callPackage ../development/tools/documentation/rsdocs2docset { };
+
   saleae-logic = callPackage ../development/tools/misc/saleae-logic { };
 
   sauce-connect = callPackage ../development/tools/sauce-connect { };
