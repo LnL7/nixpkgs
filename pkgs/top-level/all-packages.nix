@@ -17156,6 +17156,8 @@ with pkgs;
   qbittorrent = libsForQt5.callPackage ../applications/networking/p2p/qbittorrent { };
 
   eiskaltdcpp = callPackage ../applications/networking/p2p/eiskaltdcpp {
+    inherit (darwin) libobjc;
+    inherit (darwin.apple_sdk.frameworks) Cocoa;
     lua5 = lua5_1;
     miniupnpc = miniupnpc_1;
   };
