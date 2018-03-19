@@ -1,4 +1,4 @@
-{ stdenv, fetchFromGitHub }:
+{ stdenv, fetchFromGitHub, xcbuild, Cocoa }:
 
 stdenv.mkDerivation rec {
   name = "iterm2-${version}";
@@ -12,10 +12,11 @@ stdenv.mkDerivation rec {
   };
 
   patches = [ ./disable_updates.patch ];
-  postPatch = ''
-    sed -i -e 's/CODE_SIGN_IDENTITY = "Developer ID Application"/CODE_SIGN_IDENTITY = ""/g' ./iTerm2.xcodeproj/project.pbxproj
-  '';
-  makeFlagsArray = ["Deployment"];
+
+  buildInputs = [ xcbuild Cocoa ];
+
+  makeFlagsArray = [ "Deployment" ];
+
   installPhase = ''
     mkdir -p "$out/Applications"
     mv "build/Deployment/iTerm2.app" "$out/Applications/iTerm.app"

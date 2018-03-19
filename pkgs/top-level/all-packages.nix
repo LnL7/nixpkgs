@@ -20940,7 +20940,9 @@ with pkgs;
 
   imatix_gsl = callPackage ../development/tools/imatix_gsl {};
 
-  iterm2 = callPackage ../applications/misc/iterm2 {};
+  iterm2 = callPackage ../applications/misc/iterm2 {
+    inherit (darwin.apple_sdk.frameworks) Cocoa;
+  };
 
   sequeler = callPackage ../applications/misc/sequeler {
     inherit (gnome3) gtksourceview libgda libgee;
