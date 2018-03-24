@@ -43,6 +43,13 @@ stdenv.mkDerivation rec {
     (mkFlag qt5Support "QT5")
   ];
 
+  postFixup = stdenv.lib.optionalString stdenv.cc.isClang ''
+    for f in $dev/lib/pkgconfig/*.pc; do
+        substituteInPlace $f \
+            --replace 'Cflags: ' 'Cflags: -std=c++11 '
+    done
+  '';
+
   meta = with lib; {
     homepage = https://poppler.freedesktop.org/;
     description = "A PDF rendering library";
