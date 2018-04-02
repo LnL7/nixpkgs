@@ -9570,7 +9570,7 @@ with pkgs;
   libantlr3c = callPackage ../development/libraries/libantlr3c {};
 
   libaom = callPackage ../development/libraries/libaom { };
-  
+
   libappindicator-gtk2 = callPackage ../development/libraries/libappindicator { gtkVersion = "2"; };
   libappindicator-gtk3 = callPackage ../development/libraries/libappindicator { gtkVersion = "3"; };
 
@@ -16718,7 +16718,7 @@ with pkgs;
   mod-distortion = callPackage ../applications/audio/mod-distortion { };
 
   monero = callPackage ../applications/altcoins/monero {
-    inherit (darwin.apple_sdk.frameworks) IOKit;
+    inherit (darwin.apple_sdk.frameworks) IOKit PCSC;
     boost = boost15x;
   };
 
