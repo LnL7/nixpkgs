@@ -9344,10 +9344,12 @@ with pkgs;
   heimdalFull = callPackage ../development/libraries/kerberos/heimdal.nix { };
   libheimdal = heimdalFull.override { type = "lib"; };
 
-  harfbuzz = callPackage ../development/libraries/harfbuzz { };
-  harfbuzz-icu = callPackage ../development/libraries/harfbuzz {
-    withIcu = true;
+  harfbuzz = callPackage ../development/libraries/harfbuzz {
+    inherit (darwin.apple_sdk.frameworks) ApplicationServices CoreText;
+  };
+  harfbuzz-icu = harfbuzz.override {
     withGraphite2 = true;
+    withIcu = true;
   };
   harfbuzz-icu-58 = harfbuzz-icu.override {
     icu = icu58;
