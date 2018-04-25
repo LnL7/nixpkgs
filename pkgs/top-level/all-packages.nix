@@ -16477,7 +16477,10 @@ with pkgs;
 
   kipi-plugins = libsForQt5.callPackage ../applications/graphics/kipi-plugins { };
 
-  kitty = callPackage ../applications/misc/kitty { };
+  kitty = callPackage ../applications/misc/kitty {
+    inherit (darwin.apple_sdk.frameworks) Cocoa IOKit Kernel;
+    harfbuzz = harfbuzz.override { withCoreText = stdenv.isDarwin; };
+  };
 
   kiwix = callPackage ../applications/misc/kiwix { };
 
