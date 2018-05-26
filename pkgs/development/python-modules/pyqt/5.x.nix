@@ -1,5 +1,5 @@
-{ lib, fetchurl, pythonPackages, pkgconfig, makeWrapper, qmake
-, lndir, qtbase, qtsvg, qtwebkit, qtwebengine, dbus_libs
+{ lib, fetchurl, fetchpatch, pythonPackages, pkgconfig, makeWrapper
+, qmake, lndir, qtbase, qtsvg, qtwebkit, qtwebengine, dbus_libs
 , withWebSockets ? false, qtwebsockets
 , withConnectivity ? false, qtconnectivity
 }:
@@ -27,6 +27,19 @@ in buildPythonPackage {
     url = "mirror://sourceforge/pyqt/PyQt5/PyQt-${version}/PyQt5_gpl-${version}.tar.gz";
     sha256 = "1vz9c4v0k8azk2b08swwybrshzw32x8djjpq13mf9v15x1qyjclr";
   };
+
+  patches = [
+    (fetchpatch {
+      name = "pyqt-qt5.11.patch";
+      url = "https://git.archlinux.org/svntogit/packages.git/plain/trunk/pyqt-qt5.11.patch?h=packages/pyqt5&id=d01240b801203d3865b2f61fa19090cc20e55a97";
+      sha256 = "0qa7w1agjg9da99lvnqwwxnm3pp7qd683h7zggq4c269y2km812h";
+    })
+    (fetchpatch {
+      name = "pyqt-support-new-qt.patch";
+      url = "https://git.archlinux.org/svntogit/packages.git/plain/trunk/pyqt-support-new-qt.patch?h=packages/pyqt5&id=d01240b801203d3865b2f61fa19090cc20e55a97";
+      sha256 = "1nkl96f4bki37zw6iwvd4vq8z8gg45q5m1cbkbaw72395i0m7p5j";
+    })
+  ];
 
   outputs = [ "out" "dev" ];
 
