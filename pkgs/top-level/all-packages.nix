@@ -18840,11 +18840,10 @@ with pkgs;
   vimHugeX = vim_configurable;
 
   vim_configurable = vimUtils.makeCustomizable (callPackage ../applications/editors/vim/configurable.nix {
-    inherit (darwin.apple_sdk.frameworks) CoreServices Cocoa Foundation CoreData;
+    inherit (darwin.apple_sdk.frameworks) ApplicationServices Carbon CoreServices Cocoa Foundation CoreData;
     inherit (darwin) libobjc cf-private;
     inherit lua;
-    gtk2 = if stdenv.isDarwin then gtk2-x11 else gtk2;
-    guiSupport = if stdenv.isDarwin then "gtk2" else "gtk3";
+    guiSupport = if stdenv.isDarwin then "carbon" else "gtk3";
   });
 
   qpdfview = libsForQt5.callPackage ../applications/misc/qpdfview {};

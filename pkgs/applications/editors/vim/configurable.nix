@@ -1,7 +1,7 @@
 # TODO tidy up eg The patchelf code is patching gvim even if you don't build it..
 # but I have gvim with python support now :) - Marc
 args@{ source ? "default", callPackage, fetchurl, stdenv, ncurses, pkgconfig, gettext
-, writeText, lib, config, glib, gtk2, gtk3, python, perl, tcl, ruby
+, writeText, lib, config, glib, gtk2, gtk3, llvm, python, perl, tcl, ruby
 , libX11, libXext, libSM, libXpm, libXt, libXaw, libXau, libXmu
 , libICE
 , vimPlugins
@@ -9,7 +9,7 @@ args@{ source ? "default", callPackage, fetchurl, stdenv, ncurses, pkgconfig, ge
 , wrapGAppsHook
 
 # apple frameworks
-, CoreServices, CoreData, Cocoa, Foundation, libobjc, cf-private
+, ApplicationServices, Carbon, CoreServices, CoreData, Cocoa, Foundation, libobjc, cf-private
 
 , features          ? "huge" # One of tiny, small, normal, big or huge
 , wrapPythonDrv     ? false
@@ -96,9 +96,9 @@ in stdenv.mkDerivation rec {
     "--disable-motif_check"
     "--disable-athena_check"
     "--disable-nextaf_check"
-    "--disable-carbon_check"
-    "--disable-gtktest"
   ]
+  ++ stdenv.lib.optional (guiSupport != "carbon") "--disable-carbon_check"
+  ++ [ "--disable-gtktest" ]
   ++ stdenv.lib.optionals luaSupport [
     "--with-lua-prefix=${args.lua}"
     "--enable-luainterp"
@@ -117,18 +117,17 @@ in stdenv.mkDerivation rec {
   ++ stdenv.lib.optional netbeansSupport     "--enable-netbeans"
   ++ stdenv.lib.optional ximSupport          "--enable-xim";
 
-  nativeBuildInputs = [
-    pkgconfig
-  ]
+  nativeBuildInputs = [ pkgconfig ]
   ++ stdenv.lib.optional wrapPythonDrv makeWrapper
   ++ stdenv.lib.optional nlsSupport gettext
   ++ stdenv.lib.optional perlSupport perl
   ++ stdenv.lib.optional (guiSupport == "gtk3") wrapGAppsHook
   ;
 
-  buildInputs = [ ncurses libX11 libXext libSM libXpm libXt libXaw libXau
-    libXmu glib libICE ]
-    ++ (if guiSupport == "gtk3" then [gtk3] else [gtk2])
+  buildInputs = [ ncurses libX11 libXext libSM libXpm libXt libXaw libXau libXmu glib libICE ]
+    ++ stdenv.lib.optional (guiSupport == "gtk2") gtk2
+    ++ stdenv.lib.optional (guiSupport == "gtk3") gtk3
+    ++ stdenv.lib.optionals (guiSupport == "carbon") [ ApplicationServices Carbon llvm ]
     ++ stdenv.lib.optionals darwinSupport [ CoreServices CoreData Cocoa Foundation libobjc cf-private ]
     ++ stdenv.lib.optional luaSupport lua
     ++ stdenv.lib.optional pythonSupport python
@@ -142,8 +141,14 @@ in stdenv.mkDerivation rec {
       cp ${vimPlugins.vim-nix.src}/syntax/nix.vim runtime/syntax/nix.vim
     '';
 
-  NIX_LDFLAGS = stdenv.lib.optionalString (darwinSupport && stdenv.isDarwin)
-    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation";
+  NIX_CFLAGS_COMPILE = stdenv.lib.optionalString darwinSupport (stdenv.lib.concatStringsSep " " [
+    "-I${ApplicationServices}/Library/Frameworks/ApplicationServices.framework/Frameworks/QD.framework/Headers"
+    "-I${CoreServices}/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers"
+    "-I${Carbon}/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/Headers"
+    "-I${Carbon}/Library/Frameworks/Carbon.framework/Frameworks/CarbonSound.framework/Headers"
+    # "-I${llvm}/include"
+    "-I${llvm}/include/llvm-c"
+  ]);
 
   postInstall = ''
   '' + stdenv.lib.optionalString stdenv.isLinux ''
