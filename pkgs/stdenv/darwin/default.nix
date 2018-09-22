@@ -220,9 +220,15 @@ in rec {
       inherit
         zlib patchutils m4 scons flex perl bison unifdef unzip openssl python
         libxml2 gettext sharutils gmp libarchive ncurses pkg-config libedit groff
-        openssh sqlite sed serf openldap db cyrus-sasl expat apr-util subversion xz
+        openssh sqlite sed serf openldap db cyrus-sasl expat apr-util subversion /*xz*/
         findfreetype libssh curl cmake autoconf automake libtool ed cpio coreutils
         libssh2 nghttp2 libkrb5 python2 ninja;
+
+      # We are still using the shell from bootstrap-tools instead of bash at
+      # this point.  Resulting in shebang references to bootstrap-tools.
+      xz = super.xz.overrideAttrs (drv: {
+        nativeBuildInputs = drv.nativeBuildInputs or [] ++ [ bash ];
+      });
 
       darwin = super.darwin // {
         inherit (darwin)
