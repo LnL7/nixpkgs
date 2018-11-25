@@ -161,6 +161,8 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   eog = callPackage ./core/eog { };
 
+  eog-plugins = callPackage ./core/eog-plugins { };
+
   libcroco = callPackage ./core/libcroco {};
 
   libgee = callPackage ./core/libgee { };
