@@ -82,6 +82,8 @@ stdenv.mkDerivation rec {
        # For the 'urandom', maybe it should be a cross-system option
     ++ stdenv.lib.optional (stdenv.hostPlatform != stdenv.buildPlatform)
        "--with-random=/dev/urandom"
+    ++ stdenv.lib.optional stdenv.isDarwin
+       "--disable-threaded-resolver"
     ++ stdenv.lib.optionals stdenv.hostPlatform.isWindows [
       "--disable-shared"
       "--enable-static"
