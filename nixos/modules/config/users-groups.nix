@@ -564,7 +564,7 @@ in {
       };
     }) (filterAttrs (_: u: u.packages != []) cfg.users));
 
-    environment.profiles = [ "/etc/profiles/per-user/$USER" ];
+    environment.profiles = mkOrder 1100 [ "/etc/profiles/per-user/$USER" ];
 
     assertions = [
       { assertion = !cfg.enforceIdUniqueness || (uidsAreUnique && gidsAreUnique);
