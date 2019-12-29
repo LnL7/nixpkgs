@@ -1,0 +1,83 @@
+diff --git a/widget/cocoa/nsIconLoaderService.mm b/widget/cocoa/nsIconLoaderService.mm
+index 99f1a65ee3..ad0bc3589b 100644
+--- a/widget/cocoa/nsIconLoaderService.mm
++++ b/widget/cocoa/nsIconLoaderService.mm
+@@ -67,7 +67,7 @@ void nsIconLoaderService::Destroy() {
+   }
+   mNativeIconImage = nil;
+   mImageRegionRect = nullptr;
+-  mCompletionHandler = nil;
++  mCompletionHandler = nullptr;
+ }
+ 
+ nsresult nsIconLoaderService::LoadIcon(nsIURI* aIconURI) {
+diff --git a/widget/cocoa/nsTouchBar.mm b/widget/cocoa/nsTouchBar.mm
+index 39b180072d..0d06beb6e2 100644
+--- a/widget/cocoa/nsTouchBar.mm
++++ b/widget/cocoa/nsTouchBar.mm
+@@ -541,7 +541,7 @@ static const uint32_t kInputIconSize = 16;
+ }
+ 
+ - (void)releaseJSObjects {
+-  mTouchBarHelper = nil;
++  mTouchBarHelper = nullptr;
+ 
+   for (NSTouchBarItemIdentifier identifier in self.mappedLayoutItems) {
+     TouchBarInput* input = self.mappedLayoutItems[identifier];
+@@ -557,9 +557,9 @@ static const uint32_t kInputIconSize = 16;
+       [(nsTouchBar*)[(NSPopoverTouchBarItem*)item popoverTouchBar] releaseJSObjects];
+     }
+ 
+-    [input setCallback:nil];
+-    [input setDocument:nil];
+-    [input setImageURI:nil];
++    [input setCallback:nullptr];
++    [input setDocument:nullptr];
++    [input setImageURI:nullptr];
+ 
+     [input releaseJSObjects];
+   }
+@@ -695,7 +695,7 @@ static const uint32_t kInputIconSize = 16;
+ - (void)setDocument:(RefPtr<Document>)aDocument {
+   if (mIcon) {
+     mIcon->Destroy();
+-    mIcon = nil;
++    mIcon = nullptr;
+   }
+   mDocument = aDocument;
+ }
+@@ -829,9 +829,9 @@ static const uint32_t kInputIconSize = 16;
+   if (mIcon) {
+     mIcon->ReleaseJSObjects();
+   }
+-  mCallback = nil;
+-  mImageURI = nil;
+-  mDocument = nil;
++  mCallback = nullptr;
++  mImageURI = nullptr;
++  mDocument = nullptr;
+   for (TouchBarInput* child in mChildren) {
+     [child releaseJSObjects];
+   }
+@@ -840,7 +840,7 @@ static const uint32_t kInputIconSize = 16;
+ - (void)dealloc {
+   if (mIcon) {
+     mIcon->Destroy();
+-    mIcon = nil;
++    mIcon = nullptr;
+   }
+   [mKey release];
+   [mTitle release];
+diff --git a/widget/cocoa/nsTouchBarInputIcon.h b/widget/cocoa/nsTouchBarInputIcon.h
+index 6c9634f2d4..e9617cbf8b 100644
+--- a/widget/cocoa/nsTouchBarInputIcon.h
++++ b/widget/cocoa/nsTouchBarInputIcon.h
+@@ -48,7 +48,7 @@ class nsTouchBarInputIcon : public nsIconLoaderObserver {
+   // this from happening.
+   void Destroy();
+ 
+-  void ReleaseJSObjects() { mDocument = nil; }
++  void ReleaseJSObjects() { mDocument = nullptr; }
+ 
+  protected:
+   RefPtr<Document> mDocument;

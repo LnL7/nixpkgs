@@ -18970,6 +18970,7 @@ in
       gnused = gnused_422;
       inherit (darwin.apple_sdk.frameworks) CoreMedia ExceptionHandling
                                             Kerberos AVFoundation MediaToolbox
+                                            LocalAuthentication VideoToolbox
                                             CoreLocation Foundation AddressBook;
       inherit (darwin) libobjc;
       inherit (rustPackages_1_38_0) cargo rustc;

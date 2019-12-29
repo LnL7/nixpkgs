@@ -70,6 +70,7 @@ with frameworks; with libs; {
   Kernel                  = [ IOKit ];
   LDAP                    = [];
   LatentSemanticMapping   = [ Carbon ];
+  LocalAuthentication     = []; # TODO
   MapKit                  = [];
   MediaAccessibility      = [ CoreGraphics CoreText QuartzCore ];
   MediaToolbox            = [ AudioToolbox AudioUnit CoreMedia ];

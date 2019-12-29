@@ -46,7 +46,8 @@
 
 # macOS dependencies
 , xcbuild, CoreMedia, ExceptionHandling, Kerberos, AVFoundation, MediaToolbox
-, CoreLocation, Foundation, AddressBook, libobjc, cups, rsync
+, LocalAuthentication, VideoToolbox, CoreLocation, Foundation, AddressBook
+, libobjc, cups, rsync
 
 ## other
 
@@ -110,7 +111,9 @@ let
       url = "https://raw.githubusercontent.com/archlinuxarm/PKGBUILDs/09c7fa0dc1d87922e3b464c0fa084df1227fca79/extra/firefox/build-arm-libopus.patch";
       sha256 = "1zg56v3lc346fkzcjjx21vjip2s9hb2xw4pvza1dsfdnhsnzppfp";
     })
-  ] ++ lib.optional (lib.versionAtLeast ffversion "71") ./fix-ff71-lto.patch
+  ]
+  ++ lib.optional (lib.versionAtLeast ffversion "71") ./fix-ff71-lto.patch
+  ++ lib.optional (stdenv.isDarwin && lib.versionAtLeast ffversion "0" /* TODO */) ./clang-nullptr.patch
   ++ patches;
 
 in
@@ -138,7 +141,7 @@ stdenv.mkDerivation rec {
     libevent libstartup_notification libvpx /* cairo */
     icu libpng jemalloc glib
   ]
-  ++ lib.optionals (!isTorBrowserLike) [ nspr nss ]
+  ++ lib.optionals (!isTorBrowserLike) [ nss ]
   ++ lib.optional (lib.versionOlder ffversion "53") libXdamage
   ++ lib.optional (lib.versionOlder ffversion "61") hunspell
 
@@ -153,8 +156,9 @@ stdenv.mkDerivation rec {
   ++ lib.optional  gssSupport kerberos
   ++ lib.optional  waylandSupport libxkbcommon
   ++ lib.optionals stdenv.isDarwin [ CoreMedia ExceptionHandling Kerberos
-                                     AVFoundation MediaToolbox CoreLocation
-                                     Foundation libobjc AddressBook cups ];
+                                     AVFoundation MediaToolbox LocalAuthentication
+                                     VideoToolbox CoreLocation Foundation AddressBook
+                                     cups libobjc ];
 
   NIX_CFLAGS_COMPILE = [
     "-I${glib.dev}/include/gio-unix-2.0"
@@ -238,7 +242,7 @@ stdenv.mkDerivation rec {
     "--with-system-icu"
     "--enable-system-ffi"
     "--enable-system-pixman"
-    "--enable-system-sqlite"
+    #"--enable-system-sqlite"
     #"--enable-system-cairo"
     "--enable-startup-notification"
     #"--enable-content-sandbox" # TODO: probably enable after 54
@@ -254,7 +258,7 @@ stdenv.mkDerivation rec {
   ++ lib.optional (lib.versionOlder ffversion "61") "--enable-system-hunspell"
   ++ lib.optionals (lib.versionAtLeast ffversion "56") [
     "--with-libclang-path=${llvmPackages.libclang}/lib"
-    "--with-clang-path=${llvmPackages.clang}/bin/clang"
+    # "--with-clang-path=${llvmPackages.clang}/bin/clang"
   ]
   ++ lib.optionals (lib.versionAtLeast ffversion "57" && lib.versionOlder ffversion "69") [
     "--enable-webrender=build"
@@ -262,7 +266,7 @@ stdenv.mkDerivation rec {
 
   # TorBrowser patches these
   ++ lib.optionals (!isTorBrowserLike) [
-    "--with-system-nspr"
+    # "--with-system-nspr"
     "--with-system-nss"
   ]
 
