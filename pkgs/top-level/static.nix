@@ -148,9 +148,6 @@ in {
   gifsicle = super.gifsicle.override {
     static = true;
   };
-  bzip2 = super.bzip2.override {
-    linkStatic = true;
-  };
   optipng = super.optipng.override {
     static = true;
   };
