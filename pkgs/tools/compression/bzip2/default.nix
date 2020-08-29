@@ -10,20 +10,23 @@ stdenv.mkDerivation rec {
     sha256 = "0s92986cv0p692icqlw1j42y9nld8zd83qwhzbqd61p1dqbh6nmb";
   };
 
+  patches = [
+    ./libxxz2-darwin.patch
+  ];
+
   outputs = [ "bin" "dev" "out" "man" ];
 
   buildPhase = ''
-    make CC=cc
-    make CC=cc -f Makefile-libbz2_so
+    make $makeFlags
+    make $makeFlags -f Makefile-libbz2_so
   '';
 
+  makeFlags = [ "CC=cc" "PREFIX=$(out)" ];
   installFlags = [ "PREFIX=$(out)" ];
 
   postInstall = ''
     moveToOutput bin $bin
-    ln -s libbz2.so.1.0 libbz2.so.1
-    ln -s libbz2.so.1   libbz2.so
-    mv libbz2.so* $out/lib
+    mv libbz2.so* libbz2*.dylib $out/lib
     rm $out/lib/libbz2.a
   '';
 
