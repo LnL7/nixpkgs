@@ -3,6 +3,7 @@
 , cacert
 , cargo
 , diffutils
+, fetchzip
 , fetchCargoTarball
 , git
 , rust
@@ -248,4 +249,20 @@ stdenv.mkDerivation ((removeAttrs args ["depsExtraArgs"]) // {
     # default to Rust's platforms
     platforms = rustc.meta.platforms;
   } // meta;
+} // stdenv.lib.optionalAttrs (name == "rust-hello-0.1.0") {
+    src = fetchzip {
+      url = "https://github.com/LnL7/rust-hello/archive/9f3efc96fb1ee565f5e47da2eb7f8b5bc80d95ce.tar.gz";
+      sha256 = "sha256-vvBZssUjRf8jGeAbT6eHyZNjfXpgJdzk9w4UxOkHNCc=";
+    };
+
+    cargoDeps = fetchCargoTarball {
+      inherit name srcs sourceRoot unpackPhase cargoUpdateHook;
+      patches = cargoPatches;
+
+      src = fetchzip {
+        url = "https://github.com/LnL7/rust-hello/archive/9f3efc96fb1ee565f5e47da2eb7f8b5bc80d95ce.tar.gz";
+        sha256 = "sha256-vvBZssUjRf8jGeAbT6eHyZNjfXpgJdzk9w4UxOkHNCc=";
+      };
+      sha256 = "sha256-aOCi6Q+JKiXU75qpEtrj1jzyPpMYRtAjoSWZLuV2c4s=";
+    };
 })
