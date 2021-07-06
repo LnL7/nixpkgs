@@ -16773,7 +16773,9 @@ in
 
   libtifiles2 = callPackage ../development/libraries/libtifiles2 { };
 
-  libtiff = callPackage ../development/libraries/libtiff { };
+  libtiff = callPackage ../development/libraries/libtiff {
+    inherit (darwin.apple_sdk.frameworks) Cocoa GLUT;
+  };
 
   libtiger = callPackage ../development/libraries/libtiger { };
 
