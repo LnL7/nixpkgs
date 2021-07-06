@@ -3,13 +3,9 @@
 , libtiff, freetype, Cocoa, AGL, GLUT
 }:
 
-let
-  version = "1.3.6";
-in
-
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "fltk";
-  inherit version;
+  version = "1.3.6";
 
   src = fetchurl {
     url = "https://www.fltk.org/pub/fltk/${version}/fltk-${version}-source.tar.gz";
