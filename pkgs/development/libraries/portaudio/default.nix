@@ -2,10 +2,11 @@
 , AudioUnit, AudioToolbox, CoreAudio, CoreServices, Carbon }:
 
 stdenv.mkDerivation {
-  name = "portaudio-190600-20161030";
+  pname = "portaudio";
+  version = "190600-20210406";
 
   src = fetchurl {
-    url = "http://files.portaudio.com/archives/pa_stable_v190700_20210406.tgz";
+    url = "http://files.portaudio.com/archives/pa_stable_v${version}.tgz";
     sha256 = "1vrdrd42jsnffh6rq8ap2c6fr4g9fcld89z649fs06bwqx1bzvs7";
   };
 
