@@ -3,7 +3,7 @@
 
 stdenv.mkDerivation {
   pname = "portaudio";
-  version = "190600-20210406";
+  version = "190700_20210406";
 
   src = fetchurl {
     url = "http://files.portaudio.com/archives/pa_stable_v${version}.tgz";
