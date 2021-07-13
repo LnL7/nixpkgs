@@ -2,15 +2,16 @@
 
 buildGoPackage rec {
   pname = "vault";
-  version = "1.7.2";
+  version = "1.7.3";
 
   src = fetchFromGitHub {
     owner = "hashicorp";
     repo = "vault";
     rev = "v${version}";
-    sha256 = "0nd77lfccl71qn98cq1yz85aiafplxbr58nafbbflijs1fz1771q";
+    sha256 = "1ma6bmk2lmb4kvix4qsknycx5fqmhg0m4pczagi411vi7s5awxlm";
   };
 
+  patches = [ ./0001-Bump-gopsutils-dependency.patch ];
   goPackagePath = "github.com/hashicorp/vault";
 
   subPackages = [ "." ];
