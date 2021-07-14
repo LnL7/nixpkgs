@@ -2,20 +2,26 @@
 , suggestSupport ? false, zeromq, libevent, msgpack
 , lz4Support  ? false, lz4
 , zlibSupport ? false, zlib
+, autoconf, automake
 }:
 
 stdenv.mkDerivation rec {
 
   pname = "groonga";
-  version = "11.0.3";
+  version = "11.0.4";
 
   src = fetchurl {
     url    = "https://packages.groonga.org/source/groonga/${pname}-${version}.tar.gz";
-    sha256 = "sha256-oYlc6PSBLovNsEWDc6eGpDI85T6bTHgBvxA/PZP3aQU=";
+    sha256 = "19sa2jjjv58s3qgfp8xlh0r8ig754d4y5cdhpw40ik3mhsp0rwkb";
   };
 
+  preConfigure = ''
+    rm version
+    aclocal
+  '';
+
   buildInputs = with lib;
-     [ pkg-config mecab kytea libedit ]
+     [ autoconf automake pkg-config mecab kytea libedit ]
     ++ optional lz4Support lz4
     ++ optional zlibSupport zlib
     ++ optionals suggestSupport [ zeromq libevent msgpack ];
